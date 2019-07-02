@@ -90,7 +90,6 @@ enum class Plurals(private val minute: String, private val hour: String, private
     FEW("минуты", "часа", "дня"),
     MANY("минут", "часов", "дней");
 
-
     fun get(unit: TimeUnits): String {
         return when(unit){
             TimeUnits.MINUTE -> minute
