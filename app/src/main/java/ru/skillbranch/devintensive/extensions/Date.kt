@@ -79,7 +79,7 @@ fun Date.humanizeDiff(): String {
 
     //26ч - 360д "N дней назад"
     when(elapsedDays){
-        in 1..360 -> return "$startPhrase$elapsedDays ${Utils.inclination(elapsedDays.toInt(),"день","дня","дней")}$endPhrase"
+        in 1..360 -> return "$startPhrase$elapsedDays ${inclination(elapsedDays.toInt(),"день","дня","дней")}$endPhrase"
     }
     //22ч - 26ч "день назад"
     when(elapsedHours){
@@ -87,7 +87,7 @@ fun Date.humanizeDiff(): String {
     }
     //75мин 22ч "N часов назад"
     when(elapsedHours){
-        in 1..22 -> return "$startPhrase$elapsedHours ${Utils.inclination(elapsedHours.toInt(),"час","часа","часов")}$endPhrase"
+        in 1..22 -> return "$startPhrase$elapsedHours ${inclination(elapsedHours.toInt(),"час","часа","часов")}$endPhrase"
     }
     //45мин - 75мин "час назад"
     when(elapsedMinutes){
@@ -95,7 +95,7 @@ fun Date.humanizeDiff(): String {
     }
     //75с - 45мин "N минут назад"
     when(elapsedMinutes){
-        in 1..60 -> return "$startPhrase$elapsedMinutes ${Utils.inclination(elapsedMinutes.toInt(),"минута","минуты","минут")}$endPhrase"
+        in 1..60 -> return "$startPhrase$elapsedMinutes ${inclination(elapsedMinutes.toInt(),"минута","минуты","минут")}$endPhrase"
     }
     //45с - 75с "минуту назад"
     when(elapsedSeconds){
@@ -103,7 +103,7 @@ fun Date.humanizeDiff(): String {
     }
     //1с - 45с "несколько секунд назад"
     when(elapsedSeconds){
-        in 2..60 -> return "$startPhrase$elapsedSeconds ${Utils.inclination(elapsedSeconds.toInt(),"секунда","секунды","секунд")}$endPhrase"
+        in 2..60 -> return "$startPhrase$elapsedSeconds ${inclination(elapsedSeconds.toInt(),"секунда","секунды","секунд")}$endPhrase"
     }
     //0с - 1с "только что"
     when{
@@ -112,6 +112,16 @@ fun Date.humanizeDiff(): String {
 
     return ""
 
+}
+
+fun inclination(n: Int, form1:String, form2: String, form3: String) : String
+{
+    val n: Int = Math.abs(n) % 100
+    val n1: Int = n % 10
+    if (n in 11..19) return form3
+    if (n1 in 2..4) return form2
+    if (n1 == 1) return form1
+    return form3
 }
 
 enum class TimeUnits{

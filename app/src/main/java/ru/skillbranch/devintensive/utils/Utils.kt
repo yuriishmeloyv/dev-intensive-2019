@@ -66,14 +66,6 @@ object Utils {
         }
     }
 
-    fun inclination(n: Int, form1:String, form2: String, form3: String) : String
-    {
-        val n: Int = Math.abs(n) % 100
-        val n1: Int = n % 10
-        if (n in 11..19) return form3
-        if (n1 in 2..4) return form2
-        if (n1 == 1) return form1
-        return form3
-    }
+
 }
 
