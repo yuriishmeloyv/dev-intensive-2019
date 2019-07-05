@@ -36,7 +36,13 @@ enum class TimeUnits{
     SECOND,
     MINUTE,
     HOUR,
-    DAY
+    DAY;
+
+    fun plural(value : Int): String{
+
+        return "$value ${getNumForm(value, this)}"
+
+    }
 }
 
 fun Date.humanizeDiff(date: Date = Date()): String {
@@ -85,13 +91,14 @@ private fun reduceDigitsNum(number: Int): Int {
     return number % (10.0.pow((number.toString().length - 1).toDouble())).toInt()
 }
 
-enum class Plurals(private val minute: String, private val hour: String, private val day: String){
-    ONE("минуту", "час", "день"),
-    FEW("минуты", "часа", "дня"),
-    MANY("минут", "часов", "дней");
+enum class Plurals(private val second: String, private val minute: String, private val hour: String, private val day: String){
+    ONE("секунду","минуту", "час", "день"),
+    FEW("секунды","минуты", "часа", "дня"),
+    MANY("секунд","минут", "часов", "дней");
 
     fun get(unit: TimeUnits): String {
         return when(unit){
+            TimeUnits.SECOND -> second
             TimeUnits.MINUTE -> minute
             TimeUnits.HOUR -> hour
             TimeUnits.DAY -> day
