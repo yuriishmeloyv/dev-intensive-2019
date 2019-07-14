@@ -20,7 +20,7 @@ fun Activity.hideKeyboard(){
 }
 
 /**
- *  
+ *
  */
 
 fun Activity.getRootView(): View {
