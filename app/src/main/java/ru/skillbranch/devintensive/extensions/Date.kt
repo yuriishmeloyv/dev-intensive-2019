@@ -102,7 +102,6 @@ enum class Plurals(private val second: String, private val minute: String, priva
             TimeUnits.MINUTE -> minute
             TimeUnits.HOUR -> hour
             TimeUnits.DAY -> day
-            else -> ""
         }
     }
 }
