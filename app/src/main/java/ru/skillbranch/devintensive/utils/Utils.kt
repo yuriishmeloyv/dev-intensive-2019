@@ -123,14 +123,18 @@ object Utils {
         }
     }
 
-    fun convertPxToDp(context: Context, px: Float): Int {
+    fun convertPxToDp(context: Context, px: Int): Int {
         val scale = context.resources.displayMetrics.density
         return (px / scale + 0.5f).toInt()
     }
 
-    fun convertDpToPx(context: Context, dp: Float): Int {
+    fun convertDpToPx(context: Context, dp: Int): Int {
         val scale = context.resources.displayMetrics.density
         return (dp * scale + 0.5f).toInt()
+    }
+
+    fun convertSpToPx(context: Context, sp: Int): Int {
+        return (sp * context.resources.displayMetrics.scaledDensity).toInt()
     }
 
 

@@ -1,6 +1,7 @@
 package ru.skillbranch.devintensive.ui.custom
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.PorterDuff.Mode
@@ -11,6 +12,9 @@ import ru.skillbranch.devintensive.R
 import ru.skillbranch.devintensive.utils.Utils
 import kotlin.math.min
 import android.graphics.Bitmap.Config
+import android.util.TypedValue
+import androidx.core.content.ContextCompat
+import ru.skillbranch.devintensive.App
 
 class CircleImageView @JvmOverloads constructor(
     context: Context,
@@ -23,7 +27,9 @@ class CircleImageView @JvmOverloads constructor(
     }
 
     private var borderColor = DEFAULT_BORDER_COLOR
-    private var borderWidth = Utils.convertDpToPx(context, 2F)
+    private var borderWidth = Utils.convertDpToPx(context, 2)
+    private var bitmap: Bitmap? = null
+    private var text: String? = null
 
     init {
 
@@ -48,16 +54,24 @@ class CircleImageView @JvmOverloads constructor(
         canvas.drawBitmap(strokedBmp, 0F, 0F, null)
     }
 
-    fun getBorderWidth():Int = borderWidth
+    fun getBorderWidth(): Int = Utils.convertPxToDp(context, borderWidth)
 
-    fun setBorderWidth(dp: Int) { borderWidth = dp }
+    fun setBorderWidth(dp: Int) {
+        borderWidth = Utils.convertDpToPx(context, dp)
+        this.invalidate()
+    }
 
     fun getBorderColor(): Int = borderColor
 
-    fun setBorderColor(hex: String) { borderColor = Color.parseColor(hex) }
+    fun setBorderColor(hex: String) {
+        borderColor = Color.parseColor(hex)
+        this.invalidate()
+    }
 
-    fun setBorderColor(@ColorRes colorId: Int) { borderColor = colorId }
-
+    fun setBorderColor(@ColorRes colorId: Int) {
+        borderColor = ContextCompat.getColor(App.applicationContext(), colorId)
+        this.invalidate()
+    }
     private fun getStrokedBitmap(squareBmp: Bitmap, strokeWidth: Int, color: Int): Bitmap {
         val inCircle = RectF()
         val strokeStart = strokeWidth / 2F
@@ -83,15 +97,18 @@ class CircleImageView @JvmOverloads constructor(
         return Bitmap.createBitmap(bitmap, cropStartX, cropStartY, size, size)
     }
 
-    private fun getScaledBitmap(bitmap: Bitmap, minSide: Int) =
-        if (bitmap.width != minSide || bitmap.height != minSide) {
+    private fun getScaledBitmap(bitmap: Bitmap, minSide: Int) : Bitmap {
+        return if (bitmap.width != minSide || bitmap.height != minSide) {
             val smallest = min(bitmap.width, bitmap.height).toFloat()
             val factor = smallest / minSide
             Bitmap.createScaledBitmap(bitmap, (bitmap.width / factor).toInt(), (bitmap.height / factor).toInt(), false)
-        }
-        else bitmap
+        } else bitmap
+    }
 
     private fun getBitmapFromDrawable(): Bitmap? {
+        if (bitmap != null)
+            return bitmap
+
         if (drawable == null)
             return null
 
@@ -124,6 +141,52 @@ class CircleImageView @JvmOverloads constructor(
         canvas.drawBitmap(bitmap, rect, rect, paint)
 
         return outputBmp
+    }
+
+    fun createInitialProfileAvatarImage(text: String?, sizeSp: Int, theme: Resources.Theme){
+       if (bitmap == null || text != this.text){
+            val image =
+                if (text == null) {
+                    generateDefAvatar(theme)
+                }
+                else generateLetterAvatar(text, sizeSp, theme)
+
+            this.text = text
+            bitmap = image
+            invalidate()
+        }
+    }
+
+    private fun generateLetterAvatar(text: String, sizeSp: Int, theme: Resources.Theme): Bitmap {
+        val image = generateDefAvatar(theme)
+
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.textSize = sizeSp.toFloat()
+        paint.color = Color.WHITE
+        paint.textAlign = Paint.Align.CENTER
+
+        val textBounds = Rect()
+        paint.getTextBounds(text, 0, text.length, textBounds)
+
+        val backgroundBounds = RectF()
+        backgroundBounds.set(0f, 0f, layoutParams.height.toFloat(), layoutParams.height.toFloat())
+
+        val textBottom = backgroundBounds.centerY() - textBounds.exactCenterY()
+        val canvas = Canvas(image)
+        canvas.drawText(text, backgroundBounds.centerX(), textBottom, paint)
+
+        return image
+    }
+
+    private fun generateDefAvatar(theme: Resources.Theme): Bitmap {
+        val image = Bitmap.createBitmap(layoutParams.height, layoutParams.height, Config.ARGB_8888)
+        val color = TypedValue()
+        theme.resolveAttribute(R.attr.colorAccent, color, true)
+
+        val canvas = Canvas(image)
+        canvas.drawColor(color.data)
+
+        return image
     }
 
 }
