@@ -24,7 +24,7 @@ object Utils {
     fun transliteration(payload: String?, divider: String = " "): String {
 
         if(payload.isNullOrBlank()){
-            return "Необходимо передать занчение"
+            return ""
         }else{
             val translit: String = payload.replace(Regex("[абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ]")){
 

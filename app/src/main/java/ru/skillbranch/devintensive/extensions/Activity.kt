@@ -5,7 +5,8 @@ import android.content.Context
 import android.view.inputmethod.InputMethodManager
 import android.view.View
 import android.graphics.Rect
-import kotlin.math.roundToLong
+import ru.skillbranch.devintensive.utils.Utils.convertDpToPx
+
 
 /**
  * Функция скрывает Software Keyboard
@@ -35,7 +36,7 @@ fun Activity.isKeyboardOpen(): Boolean{
     val visibleBounds = Rect()
     rootView.getWindowVisibleDisplayFrame(visibleBounds)
     val heightDiff = rootView.height - visibleBounds.height()
-    val marginOfError = this.convertDpToPx(50F).roundToLong()
+    val marginOfError = convertDpToPx(this,50)
 
     return heightDiff > marginOfError
 }
