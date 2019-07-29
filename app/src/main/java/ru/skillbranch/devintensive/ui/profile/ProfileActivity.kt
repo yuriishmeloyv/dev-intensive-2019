@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -203,24 +204,25 @@ class ProfileActivity : AppCompatActivity() {
         wr_about.isCounterEnabled = isEdit
 
         with(btn_edit){
-            val filter: ColorFilter? = if(isEdit){
-                PorterDuffColorFilter(
-                    resources.getColor(R.color.color_accent,theme),
-                    PorterDuff.Mode.SRC_IN
-                )
-            }else {
-                null
+            val filter: ColorFilter? = if (isEdit){
+                PorterDuffColorFilter(getThemeAccentColor(), PorterDuff.Mode.SRC_IN)
             }
+            else null
 
-            val icon = if(isEdit){
-                resources.getDrawable(R.drawable.ic_save_black_24dp, theme)
-            }else{
-                resources.getDrawable(R.drawable.ic_edit_black_24dp, theme)
-            }
+            val icon =
+                if (isEdit)
+                    resources.getDrawable(R.drawable.ic_save_black_24dp, theme)
+                else resources.getDrawable(R.drawable.ic_edit_black_24dp, theme)
+
             background.colorFilter = filter
             setImageDrawable(icon)
         }
+    }
 
+    private fun getThemeAccentColor(): Int {
+        val value = TypedValue()
+        theme.resolveAttribute(R.attr.colorAccent, value, true)
+        return value.data
     }
 
     private fun saveProfileInfo(){
@@ -269,6 +271,7 @@ class ProfileActivity : AppCompatActivity() {
     private fun updateProfileAvatarImage(profile: Profile){
         val initials = Utils.toInitials(profile.firstName, profile.lastName)
         iv_avatar.createInitialProfileAvatarImage(initials, Utils.convertSpToPx(this, 48), theme)
+
 
     }
 }

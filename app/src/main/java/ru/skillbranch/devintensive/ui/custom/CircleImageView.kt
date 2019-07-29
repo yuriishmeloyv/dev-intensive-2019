@@ -43,15 +43,19 @@ class CircleImageView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        val bitmap = getBitmapFromDrawable() ?: return
+
+        var bitmap = getBitmapFromDrawable() ?: return
         if (width == 0 || height == 0) return
 
-        val scaledBmp = getScaledBitmap(bitmap, width)
-        val croppedBmp = getCenterCroppedBitmap(scaledBmp, width)
-        val circleBmp = getCircleBitmap(croppedBmp)
-        val strokedBmp = getStrokedBitmap(circleBmp, borderWidth, borderColor)
+        bitmap = getScaledBitmap(bitmap, width)
+        bitmap = getCenterCroppedBitmap(bitmap, width)
+        bitmap = getCircleBitmap(bitmap)
 
-        canvas.drawBitmap(strokedBmp, 0F, 0F, null)
+        if (borderWidth > 0)
+            bitmap = getStrokedBitmap(bitmap, borderWidth, borderColor)
+
+        canvas.drawBitmap(bitmap, 0F, 0F, null)
+
     }
 
     fun getBorderWidth(): Int = Utils.convertPxToDp(context, borderWidth)
@@ -72,6 +76,7 @@ class CircleImageView @JvmOverloads constructor(
         borderColor = ContextCompat.getColor(App.applicationContext(), colorId)
         this.invalidate()
     }
+
     private fun getStrokedBitmap(squareBmp: Bitmap, strokeWidth: Int, color: Int): Bitmap {
         val inCircle = RectF()
         val strokeStart = strokeWidth / 2F
@@ -88,6 +93,8 @@ class CircleImageView @JvmOverloads constructor(
         canvas.drawOval(inCircle, strokePaint)
 
         return squareBmp
+
+
     }
 
     private fun getCenterCroppedBitmap(bitmap: Bitmap, size: Int): Bitmap {
@@ -122,6 +129,7 @@ class CircleImageView @JvmOverloads constructor(
 
         return bitmap
     }
+
 
     private fun getCircleBitmap(bitmap: Bitmap): Bitmap {
         val smallest = min(bitmap.width, bitmap.height)
