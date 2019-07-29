@@ -48,8 +48,8 @@ class ProfileViewModel: ViewModel() {
     }
 
     fun onRepositoryChanged(repository: String) {
-        //repositoryError.value = isValidateRepository(repository)
-        repositoryError.value = !repository.validUrl()
+        repositoryError.value = isValidateRepository(repository)
+        //repositoryError.value = !repository.validUrl()
     }
 
 
@@ -58,7 +58,8 @@ class ProfileViewModel: ViewModel() {
     }
 
     private fun isValidateRepository(repoText: String): Boolean {
-        val regexStr = "^(?:https://)?(?:www.)?(?:github.com/)[^/|\\s]+(?<!${getRegexExceptions()})(?:/)?$"
+        //val regexStr = "^(?:https://)?(?:www.)?(?:github.com/)[^/|\\s]+(?<!${getRegexExceptions()})(?:/)?$"
+        val regexStr = "(https://)?(www.)?github.com/(\\w*[^/])"
         val regex = Regex(regexStr)
 
         return (repoText.isNotEmpty() && !regex.matches(repoText))
