@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import ru.skillbranch.devintensive.extensions.validUrl
 import ru.skillbranch.devintensive.models.Profile
 import ru.skillbranch.devintensive.repositories.PreferencesRepository
 
@@ -47,7 +48,8 @@ class ProfileViewModel: ViewModel() {
     }
 
     fun onRepositoryChanged(repository: String) {
-        repositoryError.value = isValidateRepository(repository)
+        //repositoryError.value = isValidateRepository(repository)
+        repositoryError.value = !repository.validUrl()
     }
 
 
@@ -56,8 +58,7 @@ class ProfileViewModel: ViewModel() {
     }
 
     private fun isValidateRepository(repoText: String): Boolean {
-        //val regexStr = "^(?:https://)?(?:www.)?(?:github.com/)[^/|\\s]+(?<!${getRegexExceptions()})(?:/)?$"
-        val regexStr = "^(?:https://)?(?:www.)?(?:github.com/)[^/|\\s]+(?<!${getRegexExceptions()})"
+        val regexStr = "^(?:https://)?(?:www.)?(?:github.com/)[^/|\\s]+(?<!${getRegexExceptions()})(?:/)?$"
         val regex = Regex(regexStr)
 
         return (repoText.isNotEmpty() && !regex.matches(repoText))
