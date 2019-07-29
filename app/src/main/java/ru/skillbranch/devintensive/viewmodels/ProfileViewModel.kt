@@ -56,7 +56,8 @@ class ProfileViewModel: ViewModel() {
     }
 
     private fun isValidateRepository(repoText: String): Boolean {
-        val regexStr = "^(?:https://)?(?:www.)?(?:github.com/)[^/|\\s]+(?<!${getRegexExceptions()})(?:/)?$"
+        //val regexStr = "^(?:https://)?(?:www.)?(?:github.com/)[^/|\\s]+(?<!${getRegexExceptions()})(?:/)?$"
+        val regexStr = "^(?:https://)?(?:www.)?(?:github.com/)[^/|\\s]+(?<!${getRegexExceptions()})"
         val regex = Regex(regexStr)
 
         return (repoText.isNotEmpty() && !regex.matches(repoText))
