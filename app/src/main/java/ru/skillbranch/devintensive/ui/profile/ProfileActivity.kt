@@ -170,7 +170,7 @@ class ProfileActivity : AppCompatActivity() {
         showCurrentMode(isEditMode)
 
         btn_edit.setOnClickListener{
-            viewModel.onRepositoryEditCompleted(wr_repository.isErrorEnabled)
+            viewModel.onRepoEditCompleted(wr_repository.isErrorEnabled)
             if (isEditMode) saveProfileInfo()
             isEditMode = !isEditMode
             showCurrentMode(isEditMode)
@@ -239,9 +239,9 @@ class ProfileActivity : AppCompatActivity() {
     private fun initViewModel(){
         viewModel = ViewModelProviders.of(this).get(ProfileViewModel::class.java)
         viewModel.getProfileData().observe(this, Observer { updateUI(it) })
-        viewModel.getAppTheme().observe(this, Observer { updateTheme(it) })
+        viewModel.getTheme().observe(this, Observer { updateTheme(it) })
         viewModel.getRepositoryError().observe(this, Observer { updateRepositoryError(it) })
-        viewModel.getIsRepositoryError().observe(this, Observer { updateRepository(it) })
+        viewModel.getIsRepoError().observe(this, Observer { updateRepository(it) })
     }
 
     private fun updateTheme(mode: Int) {
