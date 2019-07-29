@@ -12,14 +12,14 @@ class ProfileViewModel: ViewModel() {
     private val profileData = MutableLiveData<Profile>()
     private val appTheme = MutableLiveData<Int>()
     private val repositoryError = MutableLiveData<Boolean>()
-    private val isRepoError = MutableLiveData<Boolean>()
+    private val isRepositoryError = MutableLiveData<Boolean>()
 
     init {
         profileData.value = repository.getProfile()
         appTheme.value = repository.getAppTheme()
     }
 
-    fun getIsRepositoryError():LiveData<Boolean> = isRepoError
+    fun getIsRepositoryError():LiveData<Boolean> = isRepositoryError
 
     fun getProfileData(): LiveData<Profile>{
         return profileData
@@ -52,7 +52,7 @@ class ProfileViewModel: ViewModel() {
 
 
     fun onRepositoryEditCompleted(isError: Boolean) {
-        isRepoError.value = isError
+        isRepositoryError.value = isError
     }
 
     private fun isValidateRepository(repoText: String): Boolean {
