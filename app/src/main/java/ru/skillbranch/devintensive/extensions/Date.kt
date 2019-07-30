@@ -3,105 +3,75 @@ package ru.skillbranch.devintensive.extensions
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
-import kotlin.math.pow
+import ru.skillbranch.devintensive.extensions.TimeUnits.*
 
-const val SECOND = 1000L
-const val MINUTE = 60* SECOND
-const val HOUR = 60* MINUTE
-const val DAY = 24* HOUR
-
-fun Date.format(pattern:String = "HH:mm:ss dd.MM.yy"): String{
+fun Date.format(pattern: String = "HH:mm:ss dd.MM.yy"): String {
     val dateFormat = SimpleDateFormat(pattern, Locale("ru"))
     return dateFormat.format(this)
 }
 
-fun Date.add(value: Int, units: TimeUnits = TimeUnits.SECOND): Date{
-
-    var time = this.time
-
-    time += when(units){
-               TimeUnits.SECOND -> value* SECOND
-               TimeUnits.MINUTE -> value* MINUTE
-               TimeUnits.HOUR -> value* HOUR
-               TimeUnits.DAY -> value* DAY
-    }
-
-    this.time = time
-
+fun Date.add(value: Int, units: TimeUnits = SECOND): Date {
+    this.time += units.value * value
     return this
-
-}
-
-enum class TimeUnits{
-    SECOND,
-    MINUTE,
-    HOUR,
-    DAY;
-
-    fun plural(value : Int): String{
-
-        return "$value ${getNumForm(value, this)}"
-
-    }
 }
 
 fun Date.humanizeDiff(date: Date = Date()): String {
+    val dif = abs(this.time -  date.time)
+    val isPast = this.time < date.time
 
-    val dif = this.time -  date.time
-
-
-    var interval = when {
-        abs(dif) / SECOND.toDouble() <= 1  -> {"только что"}
-        abs(dif) / SECOND.toDouble() <= 45 -> {"несколько секунд"}
-        abs(dif) / SECOND.toDouble() <= 75 -> {"минуту назад"}
-        abs(dif) / MINUTE.toDouble() <= 45 -> {"${(abs(dif) / MINUTE).toInt()} ${getNumForm((dif / MINUTE).toInt(), TimeUnits.MINUTE)}"}
-        abs(dif) / MINUTE.toDouble() <= 75 -> {"час назад"}
-        abs(dif) / HOUR.toDouble() <= 22 -> {"${(abs(dif) / HOUR).toInt()} ${getNumForm((dif / HOUR).toInt(), TimeUnits.HOUR)}"}
-        abs(dif) / HOUR.toDouble() <= 26 -> {"день назад"}
-        abs(dif) / DAY.toDouble() <= 360 -> {"${(abs(dif) / DAY).toInt()} ${getNumForm((dif / DAY).toInt(), TimeUnits.DAY)}"}
-        else ->{""}
+    return when {
+        dif <= SECOND.value -> "только что"
+        dif <= SECOND.value * 45 -> getTenseForm("несколько секунд", isPast)
+        dif <= SECOND.value * 75 -> getTenseForm("минуту", isPast)
+        dif <= MINUTE.value * 45 -> getTenseForm(MINUTE.plural((dif / MINUTE.value).toInt()), isPast)
+        dif <= MINUTE.value * 75 -> getTenseForm("час", isPast)
+        dif <= HOUR.value * 22 -> getTenseForm(HOUR.plural((dif / HOUR.value).toInt()), isPast)
+        dif <= HOUR.value * 26 -> getTenseForm("день", isPast)
+        dif <= DAY.value * 360 -> getTenseForm(DAY.plural((dif / DAY.value).toInt()), isPast)
+        else -> if(isPast) "более года назад" else "более чем через год"
     }
-
-
-    when{
-        dif / DAY.toDouble() < -360 -> interval = "более года назад"
-        dif / SECOND.toDouble() < -1  -> interval += " назад"
-        dif / SECOND.toDouble() <= 1 -> {}
-        dif / DAY.toDouble() <= 360  -> interval = "через $interval"
-        else -> interval = "более чем через год"
-    }
-
-
-    return interval
 }
 
-fun getNumForm(amount: Int, units: TimeUnits): String {
-    val posAmount = abs(amount)
+fun getTenseForm(interval: String, isPast: Boolean): String {
+    val prefix = if (isPast) "" else "через"
+    val postfix = if (isPast) "назад" else ""
+    return "$prefix $interval $postfix".trim()
+}
 
+fun getPluralForm(amount: Int, units: TimeUnits): String {
+    val posAmount = abs(amount) % 100
 
     return when(posAmount){
-        0, in 5..19 -> Plurals.MANY.get(units)
         1 -> Plurals.ONE.get(units)
         in 2..4 -> Plurals.FEW.get(units)
-        else -> getNumForm(reduceDigitsNum(posAmount) ,units)
+        0, in 5..19 -> Plurals.MANY.get(units)
+        else -> getPluralForm(posAmount % 10, units)
     }
-}
-
-private fun reduceDigitsNum(number: Int): Int {
-    return number % (10.0.pow((number.toString().length - 1).toDouble())).toInt()
 }
 
 enum class Plurals(private val second: String, private val minute: String, private val hour: String, private val day: String){
-    ONE("секунду","минуту", "час", "день"),
-    FEW("секунды","минуты", "часа", "дня"),
+    ONE("секунду", "минуту", "час", "день"),
+    FEW("секунды", "минуты", "часа", "дня"),
     MANY("секунд","минут", "часов", "дней");
 
     fun get(unit: TimeUnits): String {
         return when(unit){
-            TimeUnits.SECOND -> second
-            TimeUnits.MINUTE -> minute
-            TimeUnits.HOUR -> hour
-            TimeUnits.DAY -> day
+            SECOND -> second
+            MINUTE -> minute
+            HOUR -> hour
+            DAY -> day
         }
     }
 }
+
+enum class TimeUnits(val value:Long){
+    SECOND(1000L),
+    MINUTE(60 * SECOND.value),
+    HOUR(60 * MINUTE.value),
+    DAY(24 * HOUR.value);
+
+    fun plural(value: Int): String{
+        return "$value ${getPluralForm(value, this)}"
+    }
+}
+

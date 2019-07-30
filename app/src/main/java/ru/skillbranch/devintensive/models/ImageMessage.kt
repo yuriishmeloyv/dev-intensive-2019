@@ -1,3 +1,4 @@
+
 package ru.skillbranch.devintensive.models
 
 import ru.skillbranch.devintensive.extensions.humanizeDiff
@@ -14,4 +15,5 @@ class ImageMessage(
 
     override fun formatMessage(): String = "${from?.firstName}" +
             " ${if(isIncoming) "получил" else "отправил"} изображение \"$image\" ${date.humanizeDiff()}"
+
 }
