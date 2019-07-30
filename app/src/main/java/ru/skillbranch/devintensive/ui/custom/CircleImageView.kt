@@ -59,22 +59,22 @@ class CircleImageView @JvmOverloads constructor (
         this.invalidate()
     }
 
-    override fun onDraw(canvas: Canvas) {
-        var bitmap = getBitmapFromDrawable() ?: return
-        if (width == 0 || height == 0) return
+     override fun onDraw(canvas: Canvas) {
+         var bitmap = getBitmapFromDrawable() ?: return
+         if (width == 0 || height == 0) return
 
-        bitmap = getScaledBitmap(bitmap, width)
-        bitmap = getCenterCroppedBitmap(bitmap, width)
-        bitmap = getCircleBitmap(bitmap)
+         bitmap = getScaledBitmap(bitmap, width)
+         bitmap = getCenterCroppedBitmap(bitmap, width)
+         bitmap = getCircleBitmap(bitmap)
 
-        if (borderWidth > 0)
-            bitmap = getStrokedBitmap(bitmap, borderWidth, borderColor)
+         if (borderWidth > 0)
+             bitmap = getStrokedBitmap(bitmap, borderWidth, borderColor)
 
-        canvas.drawBitmap(bitmap, 0F, 0F, null)
-        //setImageBitmap(bitmap)
+         canvas.drawBitmap(bitmap, 0F, 0F, null)
+         //setImageBitmap(bitmap)
     }
 
-    fun createInitialProfileAvatarImage(text: String?, sizeSp: Int, theme: Resources.Theme){
+    fun generateAvatar(text: String?, sizeSp: Int, theme: Resources.Theme){
         /* don't render if initials haven't changed */
         if (bitmap == null || text != this.text){
             val image =
@@ -193,3 +193,5 @@ class CircleImageView @JvmOverloads constructor (
         return outputBmp
     }
 }
+
+

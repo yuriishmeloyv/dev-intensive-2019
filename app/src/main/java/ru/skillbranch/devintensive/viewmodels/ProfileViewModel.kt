@@ -26,48 +26,48 @@ class ProfileViewModel: ViewModel() {
         return profileData
     }
 
-    fun getTheme(): LiveData<Int> = appTheme
+        fun getTheme(): LiveData<Int> = appTheme
 
-    fun getRepositoryError(): LiveData<Boolean> = repositoryError
+        fun getRepositoryError(): LiveData<Boolean> = repositoryError
 
-    fun saveProfileData(profile: Profile) {
-        repository.saveProfile(profile)
-        profileData.value = profile
-    }
+        fun saveProfileData(profile: Profile) {
+            repository.saveProfile(profile)
+            profileData.value = profile
+        }
 
-    override fun onCleared() {
-        super.onCleared()
-    }
+        override fun onCleared() {
+            super.onCleared()
+        }
 
-    fun switchTheme() {
-        if (appTheme.value == AppCompatDelegate.MODE_NIGHT_YES)
-            appTheme.value = AppCompatDelegate.MODE_NIGHT_NO
-        else appTheme.value = AppCompatDelegate.MODE_NIGHT_YES
+        fun switchTheme() {
+            if (appTheme.value == AppCompatDelegate.MODE_NIGHT_YES)
+                appTheme.value = AppCompatDelegate.MODE_NIGHT_NO
+            else appTheme.value = AppCompatDelegate.MODE_NIGHT_YES
 
-        repository.saveAppTheme(appTheme.value!!)
-    }
+            repository.saveAppTheme(appTheme.value!!)
+        }
 
-    fun onRepositoryChanged(repository: String) {
-        repositoryError.value = isValidateRepository(repository)
-    }
+        fun onRepositoryChanged(repository: String) {
+            repositoryError.value = isValidateRepository(repository)
+        }
 
 
-    fun onRepoEditCompleted(isError: Boolean) {
-        isRepoError.value = isError
-    }
+        fun onRepoEditCompleted(isError: Boolean) {
+            isRepoError.value = isError
+        }
 
-    private fun isValidateRepository(repoText: String): Boolean {
-        val regexStr = "^(?:https://)?(?:www.)?(?:github.com/)[^/|\\s]+(?<!${getRegexExceptions()})(?:/)?$"
-        val regex = Regex(regexStr)
+        private fun isValidateRepository(repoText: String): Boolean {
+            val regexStr = "^(?:https://)?(?:www.)?(?:github.com/)[^/|\\s]+(?<!${getRegexExceptions()})(?:/)?$"
+            val regex = Regex(regexStr)
 
-        return (repoText.isNotEmpty() && !regex.matches(repoText))
-    }
+            return (repoText.isNotEmpty() && !regex.matches(repoText))
+        }
 
-    private fun getRegexExceptions(): String {
-        val exceptions = arrayOf(
-            "enterprise", "features", "topics", "collections", "trending", "events", "marketplace", "pricing",
-            "nonprofit", "customer-stories", "security", "login", "join"
-        )
-        return exceptions.joinToString("|\\b","\\b")
-    }
+        private fun getRegexExceptions(): String {
+            val exceptions = arrayOf(
+                "enterprise", "features", "topics", "collections", "trending", "events", "marketplace", "pricing",
+                "nonprofit", "customer-stories", "security", "login", "join"
+            )
+            return exceptions.joinToString("|\\b","\\b")
+        }
 }
