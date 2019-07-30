@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.android.synthetic.main.activity_profile.*
 import ru.skillbranch.devintensive.models.Profile
 import ru.skillbranch.devintensive.repositories.PreferencesRepository
 
@@ -13,14 +12,14 @@ class ProfileViewModel: ViewModel() {
     private val profileData = MutableLiveData<Profile>()
     private val appTheme = MutableLiveData<Int>()
     private val repositoryError = MutableLiveData<Boolean>()
-    private val isRepoError = MutableLiveData<Boolean>()
+    private val isRepositoryError = MutableLiveData<Boolean>()
 
     init {
         profileData.value = repository.getProfile()
         appTheme.value = repository.getAppTheme()
     }
 
-    fun getIsRepoError():LiveData<Boolean> = isRepoError
+    fun getIsRepositoryError():LiveData<Boolean> = isRepositoryError
 
     fun getProfileData(): LiveData<Profile>{
         return profileData
@@ -52,18 +51,18 @@ class ProfileViewModel: ViewModel() {
     }
 
 
-    fun onRepoEditCompleted(isError: Boolean) {
-        isRepoError.value = isError
+    fun onRepositoryEditCompleted(isError: Boolean) {
+        isRepositoryError.value = isError
     }
 
     private fun isValidateRepository(repoText: String): Boolean {
-        val regexStr = "^(?:https://)?(?:www.)?(?:github.com/)[^/|\\s]+(?<!${getRegexExceptions()})(?:/)?$"
+        val regexStr = "^(?:https://)?(?:www.)?(?:github.com/)[^/|\\s]+(?<!${getRepositoryRegexExceptions()})(?:/)?$"
         val regex = Regex(regexStr)
 
         return (repoText.isNotEmpty() && !regex.matches(repoText))
     }
 
-    private fun getRegexExceptions(): String {
+    private fun getRepositoryRegexExceptions(): String {
         val exceptions = arrayOf(
             "enterprise", "features", "topics", "collections", "trending", "events", "marketplace", "pricing",
             "nonprofit", "customer-stories", "security", "login", "join"

@@ -71,17 +71,17 @@ class CircleImageView @JvmOverloads constructor (
             bitmap = getStrokedBitmap(bitmap, borderWidth, borderColor)
 
         canvas.drawBitmap(bitmap, 0F, 0F, null)
-        //setImageBitmap(bitmap)
+
     }
 
     fun createInitialProfileAvatarImage(text: String?, sizeSp: Int, theme: Resources.Theme){
-        /* don't render if initials haven't changed */
+
         if (bitmap == null || text != this.text){
             val image =
                 if (text == null) {
-                    generateDefAvatar(theme)
+                    createAvatarImage(theme)
                 }
-                else generateLetterAvatar(text, sizeSp, theme)
+                else createInitialsOnAvatarImage(text, sizeSp, theme)
 
             this.text = text
             bitmap = image
@@ -90,8 +90,8 @@ class CircleImageView @JvmOverloads constructor (
         }
     }
 
-    private fun generateLetterAvatar(text: String, sizeSp: Int, theme: Resources.Theme): Bitmap {
-        val image = generateDefAvatar(theme)
+    private fun createInitialsOnAvatarImage(text: String, sizeSp: Int, theme: Resources.Theme): Bitmap {
+        val image = createAvatarImage(theme)
 
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
         paint.textSize = sizeSp.toFloat()
@@ -111,7 +111,7 @@ class CircleImageView @JvmOverloads constructor (
         return image
     }
 
-    private fun generateDefAvatar(theme: Resources.Theme): Bitmap {
+    private fun createAvatarImage(theme: Resources.Theme): Bitmap {
         val image = Bitmap.createBitmap(layoutParams.height, layoutParams.height, Config.ARGB_8888)
         val color = TypedValue()
         theme.resolveAttribute(R.attr.colorAccent, color, true)
