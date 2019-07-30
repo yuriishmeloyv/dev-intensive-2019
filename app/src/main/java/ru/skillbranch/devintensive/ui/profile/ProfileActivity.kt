@@ -1,13 +1,11 @@
 package ru.skillbranch.devintensive.ui.profile
 
-
 import android.graphics.ColorFilter
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.widget.EditText
@@ -21,10 +19,9 @@ import ru.skillbranch.devintensive.models.Profile
 import ru.skillbranch.devintensive.utils.Utils
 import ru.skillbranch.devintensive.viewmodels.ProfileViewModel
 
-
 class ProfileActivity : AppCompatActivity() {
 
-    companion object{
+    companion object {
         const val IS_EDIT_MODE = "IS_EDIT_MODE"
     }
 
@@ -32,129 +29,45 @@ class ProfileActivity : AppCompatActivity() {
     var isEditMode = false
     lateinit var viewFields: Map<String, TextView>
 
-    /**
-     *  Вызывается при первом запуске или перезуске Activity.
-     *
-     *  здесь задаётся внешний вид активности (UI) через метод setContentView().
-     *  инициализируются представления
-     *  представления связываются с необходимыми данными и ресурсами
-     *  связываются данные со списками
-     *
-     *  Этот метод также предоставляет Bundle, содержащий ранее сохраненное
-     *  состояние Activity, если оно было.
-     *
-     *  Всегда сопровождается вызовом onStart().
-    */
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
         initViews(savedInstanceState)
         initViewModel()
-        Log.d("M_ProfileActivity","onCreate")
     }
 
-    /**
-     * Если Activity возвращается в приоритетный режим после вызова onStop(),
-     * то в этом случае вызывается метод onRestart().
-     * Т.е. вызывается после того, как Activity была остановлена и снова была запущена пользователем.
-     * Всегда сопровождается вызовом метода onStart().
-     *
-     * Используется для специальных действий, которые должны выполнятся при повторном запуске Activity.
-
-     */
-    override fun onRestart() {
-        super.onRestart()
-        Log.d("M_MainActivity","onRestart")
+    private fun initViewModel() {
+        viewModel = ViewModelProviders.of(this).get(ProfileViewModel::class.java)
+        viewModel.getProfileData().observe(this, Observer { updateUI(it) })
+        viewModel.getTheme().observe(this, Observer { updateTheme(it) })
+        viewModel.getRepositoryError().observe(this, Observer { updateRepoError(it) })
+        viewModel.getIsRepoError().observe(this, Observer { updateRepository(it) })
     }
 
-    /**
-     * При вызове onStart() окно еще не видно пользователю, но вскоре будет видно.
-     * Вызывается непосредственно перед тем, как активность становиться видимой пользователю.
-     *
-     * Чтение из базы данных
-     * Звпуск сложной анимации
-     * Запуск потоков, отслеживания показаний датчиков, запросов GPS, таймеров, сервисов или других процессов,
-     * которые нужны исключительно для обновления пользовательского интерфейса.
-     *
-     * Затем следует onResume(), если Activity выходит на передний план.
-     */
-    override fun onStart() {
-        super.onStart()
-        Log.d("M_MainActivity","onStart")
+    private fun updateRepository(isError: Boolean) {
+        if (isError) et_repository.text.clear()
     }
 
-    /**
-     * Вызывается, когда Activity начнет взаимодействовать с пользователем.
-     *
-     * запуск воспроизведения анимации, аудио и видео
-     * регистрация любых BroadcastReceiver или других процессов, которые вы освободили/приостановили в onPause()
-     * выполнение любых других инициализаций, которые должны происходить, когда Activity вновь активна (камера).
-     *
-     * Тут должен быть максимально легкий и быстрый код чтобы приложение оставалось отзывчивым
-     */
-    override fun onResume() {
-        super.onResume()
-        Log.d("M_MainActivity","onResume")
+    private fun updateRepoError(isError: Boolean) {
+        wr_repository.isErrorEnabled = isError
+        wr_repository.error = if (isError) "Невалидный адрес репозитория" else null
     }
 
-    /**
-     * Метод onPause() вызывается после сворачивания текущей активности или перехода к новой.
-     * От onPause() можно перейти к вызову либо onResume(), либо onStop().
-     *
-     * остановка анимации, аудио и видео
-     * сохранение состояния пользовательского ввода (легкие процессы)
-     * сохранение в DB если данные должны быть доступны в новой Activity
-     * остановка сервисов, подписок, BroadcastReceiver
-     *
-     * Тут должен быть максимально легкий и быстрый код чтобы приложение оставалось отзывчивым
-     */
-
-    override fun onPause() {
-        super.onPause()
-        Log.d("M_MainActivity","onPause")
+    private fun updateTheme(mode: Int) {
+        delegate.setLocalNightMode(mode)
     }
 
-    /**
-     * Метод onStop() вызывается, когда Activity становиться невидимым для пользователя.
-     * Это может произойти при ее уничтожении, или если была запущена другая Activity (существующая или новая),
-     * перекрывшая окно текущей Activity.
-     *
-     * запись в базу данных
-     * приостановка сложной анимации
-     * приостановка потоков, отслеживание показаний датчиков, запросов к GPS, таймеров, сервисов или других процессов,
-     * которые нужны исключительно для обновления пользовательского интерфейса
-     *
-     * Не вызывается при вызове метода finish() у Activity
-     */
-    override fun onStop() {
-        super.onStop()
-        Log.d("M_MainActivity","onStop")
-    }
-
-    /**
-     * Метод вызывается при окончании работы Activity, при вызове метода finish() или в случае,
-     * когда система иничтожает этот экземпляр активности для освобождения ресурсов.
-     */
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("M_MainActivity","onDestroy")
-    }
-
-    /**
-     * Этот метод сохраняет состояние представления в Bundle
-     * Для API Level < 28 (Android P) этот метод будет вызываться до onStop(), и нет никаких гарантий относительно того,
-     * произойдет ли это до или после OnPause().
-     * Для API Level >=28 будет вызван после onStop()
-     * Не будет вызван если Activity будет явно закрыто пользователем прин ажатии на системную клавищу back
-     */
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-        outState?.putBoolean(IS_EDIT_MODE,isEditMode)
+    private fun updateUI(profile: Profile) {
+        profile.toMap().also {
+            for ((k, v) in viewFields) {
+                v.text = it[k].toString()
+            }
+        }
+        updateAvatar(profile)
     }
 
     private fun initViews(savedInstanceState: Bundle?) {
-
         viewFields = mapOf(
             "nickName" to tv_nick_name,
             "rank" to tv_rank,
@@ -163,20 +76,20 @@ class ProfileActivity : AppCompatActivity() {
             "about" to et_about,
             "repository" to et_repository,
             "rating" to tv_rating,
-            "respect" to tv_respect
-        )
+            "respect" to tv_respect)
 
-        isEditMode = savedInstanceState?.getBoolean(IS_EDIT_MODE, false)?: false
+        isEditMode = savedInstanceState?.getBoolean(IS_EDIT_MODE) ?: false
         showCurrentMode(isEditMode)
 
-        btn_edit.setOnClickListener{
+        btn_edit.setOnClickListener {
             viewModel.onRepoEditCompleted(wr_repository.isErrorEnabled)
+
             if (isEditMode) saveProfileInfo()
-            isEditMode = !isEditMode
+            isEditMode = isEditMode.not()
             showCurrentMode(isEditMode)
         }
 
-        btn_switch_theme.setOnClickListener{
+        btn_switch_theme.setOnClickListener {
             viewModel.switchTheme()
         }
 
@@ -190,17 +103,19 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun showCurrentMode(isEdit: Boolean) {
-        val info = viewFields.filter { setOf("firstName", "lastName", "about", "repository").contains(it.key) }
+        val info = viewFields.filter {
+            setOf("firstName", "lastName", "about", "repository" ).contains(it.key)
+        }
 
-       info.forEach{
+        info.forEach {
             val v = it.value as EditText
             v.isFocusable = isEdit
             v.isFocusableInTouchMode = isEdit
             v.isEnabled = isEdit
-            v.background.alpha = if(isEdit) 255 else 0
+            v.background.alpha = if (isEdit) 255 else 0
         }
 
-        ic_eye.visibility = if(isEdit) View.GONE else View.VISIBLE
+        ic_eye.visibility = if (isEdit) View.GONE else View.VISIBLE
         wr_about.isCounterEnabled = isEdit
 
         with(btn_edit){
@@ -227,52 +142,23 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun saveProfileInfo(){
         Profile(
-
             firstName = et_first_name.text.toString(),
             lastName = et_last_name.text.toString(),
             about = et_about.text.toString(),
             repository = et_repository.text.toString()
-
-        ).apply { viewModel.saveProfileData(this)}
-    }
-
-    private fun initViewModel(){
-        viewModel = ViewModelProviders.of(this).get(ProfileViewModel::class.java)
-        viewModel.getProfileData().observe(this, Observer { updateUI(it) })
-        viewModel.getTheme().observe(this, Observer { updateTheme(it) })
-        viewModel.getRepositoryError().observe(this, Observer { updateRepositoryError(it) })
-        viewModel.getIsRepoError().observe(this, Observer { updateRepository(it) })
-    }
-
-    private fun updateTheme(mode: Int) {
-        Log.d("M_ProfileActivity","updateTheme")
-        delegate.setLocalNightMode(mode)
-    }
-
-    private fun updateUI(profile: Profile) {
-        profile.toMap().also {
-            for((k, v) in viewFields){
-                v.text = it[k].toString()
-            }
+        ).apply {
+            viewModel.saveProfileData(this)
         }
-
-        updateProfileAvatarImage(profile)
     }
 
-    private fun updateRepository(isError: Boolean) {
-        if (isError) et_repository.text.clear()
-    }
-
-    private fun updateRepositoryError(isError: Boolean) {
-        wr_repository.isErrorEnabled = isError
-        wr_repository.error = if (isError) "Невалидный адрес репозитория" else null
-    }
-
-    private fun updateProfileAvatarImage(profile: Profile){
+    private fun updateAvatar(profile: Profile){
         val initials = Utils.toInitials(profile.firstName, profile.lastName)
         iv_avatar.createInitialProfileAvatarImage(initials, Utils.convertSpToPx(this, 48), theme)
 
+    }
 
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState?.putBoolean(IS_EDIT_MODE, isEditMode)
     }
 }
-
