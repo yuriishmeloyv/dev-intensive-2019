@@ -171,6 +171,7 @@ class ProfileActivity : AppCompatActivity() {
 
         btn_edit.setOnClickListener{
             viewModel.onRepositoryEditCompleted(wr_repository.isErrorEnabled)
+
             if (isEditMode) saveProfileInfo()
             isEditMode = !isEditMode
             showCurrentMode(isEditMode)
@@ -238,6 +239,7 @@ class ProfileActivity : AppCompatActivity() {
         viewModel.getTheme().observe(this, Observer { updateTheme(it) })
         viewModel.getRepositoryError().observe(this, Observer { setRepositoryError(it) })
         viewModel.getIsRepositoryError().observe(this, Observer { clearRepositoryText(it) })
+
     }
 
     private fun updateTheme(mode: Int) {
@@ -258,6 +260,8 @@ class ProfileActivity : AppCompatActivity() {
     private fun clearRepositoryText(isError: Boolean) {
         if (isError) et_repository.text.clear()
     }
+
+
 
     private fun setRepositoryError(isError: Boolean) {
         wr_repository.isErrorEnabled = isError
